@@ -54,9 +54,27 @@ export class CryptoService {
       payload,
       this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
       {
-        expiresIn: '1d',
+        expiresIn: '7d',
       },
     );
+  }
+
+  async getResetToken(userId: string): Promise<{
+    token: string;
+    expiryTime: Date;
+  }> {
+    const expiryTime = new Date(new Date().getTime() + 15 * 60 * 1000);
+    const token = sign(
+      { userId },
+      this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
+      {
+        expiresIn: '7d',
+      },
+    );
+    return {
+      token,
+      expiryTime,
+    };
   }
 
   async verifyAccessToken(token: string): Promise<TJWTPayload> {

@@ -52,12 +52,40 @@ export class UsersController {
 
   @Post('/forgot-password')
   async forgotPassword(@Body() body: ForgotPasswordDto) {
-    return {}
+    const { email } = body;
+    const user = await this.userService.findByEmail(email);
+
+    if (!user) {
+      throw new BadRequestException('No user with this Email')
+    }
+
+    const response = this.cryptoService.getResetToken(user._id)
+    // TODO: FIX
+    // await this.userService.update(user._id, { passwordResetData: response });
+    // TODO: Send user email with token
+
+    return {
+      message: 'Successfully send password reset email to your email',
+    };
   }
 
   @Post('/reset-password')
   async resetPassword(@Body() body: ResetPasswordDto) {
-    return {}
+    // TODO: FIX
+    const userId = '';
+    const user = await this.userService.findById(userId);
+    if (!user?.passwordResetData?.expiryTime) {
+      throw new BadRequestException('Your password reset link is expired. Please try again.');
+    }
+
+    if (user.passwordResetData.expiryTime <= new Date()) {
+      throw new BadRequestException('Your password reset link is expired. Please try again.');
+    }
+    const hashPassword = await this.cryptoService.hashPassword(body.password);
+    await this.userService.update(userId, { password: hashPassword });
+    return {
+      message: 'Successfully updated user password',
+    };
   }
 
   @Post('/update-password')
