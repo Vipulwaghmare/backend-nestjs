@@ -1,6 +1,7 @@
 import { IsString, MinLength } from 'class-validator';
+import { JWT_DTO } from '../crypto.service';
 
-export class UpdatePasswordDto {
+export class UpdatePasswordDto extends JWT_DTO {
   @IsString()
   @MinLength(6)
   readonly newPassword: string;

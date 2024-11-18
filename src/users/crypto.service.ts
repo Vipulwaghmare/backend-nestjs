@@ -1,11 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { compare, hash } from 'bcrypt';
+import { Type } from 'class-transformer';
+import { IsDefined, IsString, ValidateNested } from 'class-validator';
 import { sign, verify } from 'jsonwebtoken';
 
 type TJWTPayload = {
   userId: string;
   userEmail: string;
+}
+
+class JWT_Payload {
+  @IsString()
+  readonly userId: string;
+
+  @IsString()
+  readonly userEmail: string;
+}
+
+export class JWT_DTO {
+  @IsDefined({ message: 'Unauthorized! Invalid token.' })
+  @ValidateNested()
+  @Type(() => JWT_Payload)
+  jwtPayload: JWT_Payload;
 }
 
 @Injectable()

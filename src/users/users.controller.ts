@@ -62,20 +62,20 @@ export class UsersController {
 
   @Post('/update-password')
   async updatePassword(@Body() body: UpdatePasswordDto) {
-    const userId: string = '';
+    const userId = body.jwtPayload.userId;
     const user = await this.userService.findById(userId, { email: 1, password: 1 });
     if (!user) {
       throw new BadRequestException('Invalid email');
     }
     const isMatched = await this.cryptoService.validatePassword(body.password, user.password);
-    const userEmail = user.email;
     if (!isMatched) {
+      // const userEmail = user.email;
       // TODO: Send email to user that password update attempt was made
       throw new BadRequestException('Invalid password');
     }
     const hashPassword = await this.cryptoService.hashPassword(body.newPassword);
 
-    const updatedUser = await this.userService.update(userId, { password: hashPassword });
+    await this.userService.update(userId, { password: hashPassword });
     // TODO: Send email to user that password update was successful
     return {
       message: 'Password updated successfully',
