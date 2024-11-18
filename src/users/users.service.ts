@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Model } from 'mongoose';
+import { Error as MongooseError, Model } from 'mongoose';
 import { User } from './user.interface';
 import { CreateUserDto } from './dtos/create-user.dto';
 
@@ -10,8 +10,28 @@ export class UsersService {
     private userModel: Model<User>,
   ) { }
 
-  async create(createCatDto: CreateUserDto): Promise<User> {
-    const createdUser = new this.userModel(createCatDto);
-    return createdUser.save();
+  async create(createCatDto: CreateUserDto): Promise<User | { error: string }> {
+    try {
+      const createdUser = new this.userModel(createCatDto);
+      return createdUser.save();
+    } catch (error) {
+      return { error }
+    }
   }
+
+  async update(id: string, updateCatDto: Partial<CreateUserDto>): Promise<User | { error: string }> {
+    try {
+      return this.userModel.findByIdAndUpdate(id, updateCatDto, { new: true }).exec();
+    } catch (error) {
+      return { error }
+    }
+  }
+
+  async findByEmail(email: string, fields = {}): Promise<User | undefined> {
+    return this.userModel.findOne({ email }, fields).exec();
+  };
+
+  async findById(id: string, fields = {}): Promise<User | undefined> {
+    return this.userModel.findById(id, fields).exec();
+  };
 }
