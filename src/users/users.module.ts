@@ -5,7 +5,7 @@ import { DatabaseModule } from 'src/database/database.module';
 import { usersProvider } from './user.provider';
 import { CryptoService } from '../services/crypto.service';
 import { AuthMiddleware } from 'src/middlewares/auth.middleware';
-import { EmailService } from 'src/services/email.service';
+import { EmailService } from '../services/email.service';
 
 @Module({
   imports: [DatabaseModule],

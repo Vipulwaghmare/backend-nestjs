@@ -6,7 +6,7 @@ import { ForgotPasswordDto } from './dtos/forgot-password.dto';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
 import { UpdatePasswordDto } from './dtos/update-password.dto';
 import { CryptoService } from '../services/crypto.service';
-import { EmailService } from 'src/services/email.service';
+import { EmailService } from '../services/email.service';
 
 @Controller('users')
 export class UsersController {
