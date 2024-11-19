@@ -66,9 +66,9 @@ export class CryptoService {
     const expiryTime = new Date(new Date().getTime() + 15 * 60 * 1000);
     const token = sign(
       { userId },
-      this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
+      this.configService.get('JWT_RESET_TOKEN_SECRET'),
       {
-        expiresIn: '7d',
+        expiresIn: '15m',
       },
     );
     return {
@@ -83,5 +83,13 @@ export class CryptoService {
 
   async verifyRefreshToken(token: string): Promise<TJWTPayload> {
     return verify(token, this.configService.get('JWT_REFRESH_TOKEN_SECRET')) as TJWTPayload
+  }
+
+  async verifyResetToken(token: string): Promise<{
+    userId: string;
+  }> {
+    return verify(token, this.configService.get('JWT_RESET_TOKEN_SECRET')) as {
+      userId: string;
+    }
   }
 }

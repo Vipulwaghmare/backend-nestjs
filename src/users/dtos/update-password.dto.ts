@@ -1,5 +1,5 @@
 import { IsString, MinLength } from 'class-validator';
-import { JWT_DTO } from '../crypto.service';
+import { JWT_DTO } from '../../services/crypto.service';
 
 export class UpdatePasswordDto extends JWT_DTO {
   @IsString()

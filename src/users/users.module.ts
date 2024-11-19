@@ -3,13 +3,14 @@ import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { DatabaseModule } from 'src/database/database.module';
 import { usersProvider } from './user.provider';
-import { CryptoService } from './crypto.service';
+import { CryptoService } from '../services/crypto.service';
 import { AuthMiddleware } from 'src/middlewares/auth.middleware';
+import { EmailService } from 'src/services/email.service';
 
 @Module({
   imports: [DatabaseModule],
   controllers: [UsersController],
-  providers: [UsersService, ...usersProvider, CryptoService],
+  providers: [UsersService, ...usersProvider, CryptoService, EmailService],
 
 })
 export class UsersModule {

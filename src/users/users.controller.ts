@@ -1,15 +1,20 @@
-import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Post, Headers } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { LoginUserDto } from './dtos/login-user.dto';
 import { ForgotPasswordDto } from './dtos/forgot-password.dto';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
 import { UpdatePasswordDto } from './dtos/update-password.dto';
-import { CryptoService } from './crypto.service';
+import { CryptoService } from '../services/crypto.service';
+import { EmailService } from 'src/services/email.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly userService: UsersService, private readonly cryptoService: CryptoService) { }
+  constructor(
+    private readonly userService: UsersService,
+    private readonly cryptoService: CryptoService,
+    private readonly emailService: EmailService
+  ) { }
 
   @Post('/register')
   async register(@Body() body: CreateUserDto) {
@@ -51,7 +56,7 @@ export class UsersController {
   }
 
   @Post('/forgot-password')
-  async forgotPassword(@Body() body: ForgotPasswordDto) {
+  async forgotPassword(@Body() body: ForgotPasswordDto, @Headers() headers) {
     const { email } = body;
     const user = await this.userService.findByEmail(email);
 
@@ -59,10 +64,19 @@ export class UsersController {
       throw new BadRequestException('No user with this Email')
     }
 
-    const response = this.cryptoService.getResetToken(user._id)
-    // TODO: FIX
-    // await this.userService.update(user._id, { passwordResetData: response });
-    // TODO: Send user email with token
+    const response = await this.cryptoService.getResetToken(user._id);
+    const host = `http://${headers.host}`;
+    const message = `You are receiving this because you requested a password reset.\n
+           Please click on the following link, or paste it into your browser to reset your password:\n
+           ${host}/auth/reset-password/${response.token} 
+           If you did not request this, please ignore this email.`;
+
+    this.emailService.sendEmail({
+      to: email,
+      subject: 'Password Reset Link',
+      text: message,
+    })
+    this.userService.update(user._id, { passwordResetData: response });
 
     return {
       message: 'Successfully send password reset email to your email',
@@ -71,18 +85,20 @@ export class UsersController {
 
   @Post('/reset-password')
   async resetPassword(@Body() body: ResetPasswordDto) {
-    // TODO: FIX
-    const userId = '';
+    const decodedData = await this.cryptoService.verifyResetToken(body.token);
+    if (!decodedData) {
+      throw new BadRequestException('Your password reset link is expired. Please try again.');
+    }
+    const userId = decodedData.userId;
     const user = await this.userService.findById(userId);
     if (!user?.passwordResetData?.expiryTime) {
       throw new BadRequestException('Your password reset link is expired. Please try again.');
     }
-
     if (user.passwordResetData.expiryTime <= new Date()) {
       throw new BadRequestException('Your password reset link is expired. Please try again.');
     }
     const hashPassword = await this.cryptoService.hashPassword(body.password);
-    await this.userService.update(userId, { password: hashPassword });
+    await this.userService.update(userId, { password: hashPassword, passwordResetData: null });
     return {
       message: 'Successfully updated user password',
     };

@@ -15,7 +15,7 @@ export class EmailService {
       host: this.configService.get('SMTP_SERVER'),
       secure: false,
       auth: {
-        user: this.configService.get('SMTP_API_KEY_NAME'),
+        user: this.configService.get('SMTP_API_KEY_ID'),
         pass: this.configService.get('SMTP_API_SECRET'),
       },
     })

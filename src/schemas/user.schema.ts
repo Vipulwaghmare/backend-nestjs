@@ -23,7 +23,6 @@ export const userSchema = new Schema({
   name: {
     type: String,
     required: [true, 'Please provide name'],
-    unique: true,
   },
   email: {
     type: String,
