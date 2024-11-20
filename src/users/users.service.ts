@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Error as MongooseError, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { User } from './user.interface';
-import { CreateUserDto } from './dtos/create-user.dto';
+import { CreateUserDto } from '../auth/dtos/create-user.dto';
 
 @Injectable()
 export class UsersService {
