@@ -1,10 +1,10 @@
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
-import { DatabaseModule } from 'src/database/database.module';
+import { DatabaseModule } from '../database/database.module';
 import { usersProvider } from './user.provider';
 import { CryptoService } from '../services/crypto.service';
-import { AuthMiddleware } from 'src/middlewares/auth.middleware';
+import { AuthMiddleware } from '../middlewares/auth.middleware';
 import { EmailService } from '../services/email.service';
 
 @Module({
