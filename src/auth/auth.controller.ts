@@ -8,6 +8,8 @@ import { ResetPasswordDto } from './dtos/reset-password.dto';
 import { UpdatePasswordDto } from './dtos/update-password.dto';
 import { CryptoService } from '../services/crypto.service';
 import { EmailService } from '../services/email.service';
+import { ApiBadRequestResponse, ApiOkResponse, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { validationApiResOptions } from 'src/dto/validation-error.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -19,6 +21,24 @@ export class AuthController {
   ) { }
 
   @Post('/register')
+  @ApiOperation({ summary: 'Register User' })
+  @ApiOkResponse({
+    description: 'User Created Successfully',
+    // type: CreateUserDto
+    // content: {
+    //   'application/json': {
+    //     example: {
+    //       message: 'User Created Successfully'
+    //     }
+    //   },
+    // }
+  })
+  @ApiResponse(validationApiResOptions)
+  @ApiBadRequestResponse({
+    description: 'Bad Request', // TODO: Fix this
+    // type: CreateUserDto
+    // isArray: true,
+  })
   async register(@Body() body: CreateUserDto) {
     const hashPassword = await this.cryptoService.hashPassword(body.password);
     const resp = await this.userService.create({
@@ -35,6 +55,7 @@ export class AuthController {
   }
 
   @Post('/login')
+  @ApiResponse(validationApiResOptions)
   async login(@Body() body: LoginUserDto) {
     const email = body.email.trim().toLowerCase();
     const user = await this.userService.findByEmail(email, { email: 1, password: 1 });
@@ -60,6 +81,7 @@ export class AuthController {
   }
 
   @Post('/forgot-password')
+  @ApiResponse(validationApiResOptions)
   async forgotPassword(@Body() body: ForgotPasswordDto, @Headers() headers) {
     const email = body.email.trim().toLowerCase();
     const user = await this.userService.findByEmail(email);
@@ -86,6 +108,10 @@ export class AuthController {
   }
 
   @Post('/reset-password')
+  @ApiResponse(validationApiResOptions)
+  @ApiOkResponse({
+    description: 'Successfully updated user password',
+  })
   async resetPassword(@Body() body: ResetPasswordDto) {
     const decodedData = await this.cryptoService.verifyResetToken(body.token);
     if (!decodedData) {
@@ -110,6 +136,11 @@ export class AuthController {
   }
 
   @Post('/update-password')
+  @ApiResponse(validationApiResOptions)
+  @ApiOkResponse({
+    description: 'Successfully updated user password',
+  })
+
   async updatePassword(@Body() body: UpdatePasswordDto) {
     const userId = body.jwtPayload.userId;
     const user = await this.userService.findById(userId, { email: 1, password: 1 });
@@ -126,7 +157,7 @@ export class AuthController {
     await this.userService.update(userId, { password: hashPassword });
     // TODO: Send email to user that password update was successful
     return {
-      message: 'Password updated successfully',
+      message: 'Successfully updated user password',
     };
   }
 }

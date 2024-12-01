@@ -19,7 +19,12 @@ export class UsersService {
     }
   }
 
-  async update(id: string, updateCatDto: Partial<CreateUserDto>): Promise<User | { error: string }> {
+  async update(id: string, updateCatDto: {
+    name?: string;
+    email?: string;
+    password?: string;
+    passwordResetData?: { expiryTime: Date; token: string };
+  }): Promise<User | { error: string }> {
     try {
       return this.userModel.findByIdAndUpdate(id, updateCatDto, { new: true }).exec();
     } catch (error) {
