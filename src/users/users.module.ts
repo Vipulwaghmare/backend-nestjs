@@ -3,8 +3,8 @@ import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { DatabaseModule } from '../database/database.module';
 import { usersProvider } from './user.provider';
-import { AuthMiddleware } from 'src/middlewares/auth.middleware';
-import { CryptoService } from 'src/services/crypto.service';
+import { AuthMiddleware } from '../middlewares/auth.middleware';
+import { CryptoService } from '../services/crypto.service';
 
 @Module({
   imports: [DatabaseModule],

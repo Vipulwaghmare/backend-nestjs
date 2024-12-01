@@ -9,7 +9,7 @@ import { UpdatePasswordDto } from './dtos/update-password.dto';
 import { CryptoService } from '../services/crypto.service';
 import { EmailService } from '../services/email.service';
 import { ApiBadRequestResponse, ApiOkResponse, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { validationApiResOptions } from 'src/dto/validation-error.dto';
+import { validationApiResOptions } from '../dto/validation-error.dto';
 
 @Controller('auth')
 export class AuthController {
