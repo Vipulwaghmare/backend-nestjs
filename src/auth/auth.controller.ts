@@ -55,6 +55,7 @@ export class AuthController {
       success: `User is logged in with email: ${email}`,
       accessToken,
       refreshToken,
+      userId: user._id,
     };
   }
 

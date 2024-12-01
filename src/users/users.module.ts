@@ -3,14 +3,23 @@ import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { DatabaseModule } from '../database/database.module';
 import { usersProvider } from './user.provider';
+import { AuthMiddleware } from 'src/middlewares/auth.middleware';
+import { CryptoService } from 'src/services/crypto.service';
 
 @Module({
   imports: [DatabaseModule],
   controllers: [UsersController],
   providers: [
     UsersService,
-    ...usersProvider
+    ...usersProvider,
+    CryptoService
   ],
   exports: [UsersService],
 })
-export class UsersModule { }
+export class UsersModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthMiddleware)
+      .forRoutes({ path: '/users/*', method: RequestMethod.ALL });
+  }
+}
